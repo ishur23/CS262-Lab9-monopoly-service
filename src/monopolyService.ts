@@ -41,6 +41,10 @@
 
 import express from 'express';
 import pgPromise from 'pg-promise';
+import dotenv from 'dotenv';
+
+// Load environment variables from .env file
+dotenv.config();
 
 // Import types for compile-time checking.
 import type { Request, Response, NextFunction } from 'express';
@@ -236,8 +240,8 @@ function readGames(_request: Request, response: Response, next: NextFunction): v
 }
 
 function readGame(request: Request, response: Response, next: NextFunction): void {
-    db.oneOrNone('SELECT P.name, PG.score FROM PlayerGame AS PG, Player AS P WHERE gameId=${gameId} AND playerID=P.ID', request.params)
-        .then((data: PlayerGame | null): void => {
+    db.manyOrNone('SELECT P.name, PG.score FROM PlayerGame AS PG, Player AS P WHERE gameID=${id} AND playerID=P.ID', request.params)
+        .then((data: PlayerGame[] | null): void => {
             returnDataOr404(response, data);
         })
         .catch((error: Error): void => {
